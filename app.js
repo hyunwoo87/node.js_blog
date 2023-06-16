@@ -17,5 +17,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(port, "블로그가 열렸습니다");
 });
-
-module.exports = connect;
