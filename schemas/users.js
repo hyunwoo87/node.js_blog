@@ -24,8 +24,7 @@ const usersSchema = new mongoose.Schema({
     required: true,
   },
   date: {
-    type: String,
-    Number,
+    type: Date,
     required: true,
   },
 });
