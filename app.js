@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = 3000;
 
-const usersRouter = require("./routes/users");
+const usersRouter = require("./routes/users.js");
 const commentRouter = require("./routes/comment.js");
 const connect = require("./schemas/index.js");
 connect();
