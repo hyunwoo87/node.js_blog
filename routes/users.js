@@ -1,119 +1,101 @@
 const express = require("express");
-
 const router = express.Router();
 
-const users = [
-  {
-    usersId: 1,
-    name: "드웨인 존슨",
-    title: "Hi",
-    content: "Nice to mee to",
-    date: new Date("2020-04-21"),
-  },
-  {
-    usersId: 2,
-    name: "마르코 로이스",
-    title: "der Frieden",
-    content: "Freut mich, Sie kennen zu lernen",
-    date: new Date("2021-05-11"),
-  },
-  {
-    usersId: 3,
-    name: "알프레드 노벨",
-    title: "lugn",
-    content: "det var angenämt att träffas",
-    date: new Date("1999-12-31"),
-  },
-  {
-    usersId: 4,
-    name: "박지성",
-    title: "안녕하세요",
-    content: "반갑습니다",
-    date: new Date("2002-06-04"),
-  },
-  {
-    usersId: 5,
-    name: "폴 메카트니",
-    title: "Hello",
-    content: "Nice to mee to",
-    date: new Date("2018-05-07"),
-  },
-];
-
-router.get("/users", (req, res) => {
-  res.json({ users });
-});
-
-router.get("/users/:usersId", (req, res) => {
-  const { usersId } = req.params;
-  const [detail] = users.filter((users) => Number(usersId) === users.usersId);
-
-  res.status(200).json({ detail });
-});
-
-const Comment = require("../schemas/comment.js");
-router.post("/users/:usersId/comment", async (req, res) => {
-  const { usersId } = req.params;
-  const { quantity } = req.body;
-
-  const existsComment = await Comment.find({ usersId });
-  if (existsComment.length) {
-    return res
-      .status(400)
-      .json({ success: false, errorMessage: "게시글이 존재 합니다" });
-  }
-
-  await Comment.create({ usersId, quantity });
-
-  res.json({ result: "작성 되었습니다" });
-});
-
-router.put("/users/:usersId/comment", async (req, res) => {
-  const { usersId } = req.params;
-  const { quantity } = req.body;
-
-  const existsComment = await Comment.find({ usersId });
-  if (existsComment.length) {
-    await Comment.updateOne(
-      { usersId: usersId },
-      { $set: { quantity: quantity } }
-    );
-  }
-  res.status(200).json({ success: true });
-});
-
-router.delete("/users/:usersId/comment", async (req, res) => {
-  const { usersId } = req.params;
-
-  const existsComment = await Comment.find({ usersId });
-  if (existsComment.length) {
-    await Comment.deleteOne({ usersId });
-  }
-  res.json({ result: "success" });
-});
-
 const Users = require("../schemas/users.js");
-router.post("/users/", async (req, res) => {
-  const { usersId, name, title, content, date } = req.body;
 
-  const users = await Users.find({ usersId });
+router.get("/users", async (req, res) => {
+  try {
+    const users = await Users.find()
+      .select("-password -content -__v")
+      .sort({ data: -1 });
 
-  if (users.length) {
+    res.json({ data: users });
+  } catch (error) {
+    res.status(500).json({ error: "조회에 실패했습니다" });
+  }
+});
+
+router.users("/users", async (req, res) => {
+  const { userId, password, name, title, content } = req.body;
+
+  const existingUser = await Users.find({ users });
+  if (existinguUers.length) {
     return res.status(400).json({
       success: false,
-      errorMessage: "이미 존재하는 ID",
+      errorMessage: "중복됩니다",
     });
   }
 
-  const createUsers = await Users.create({
-    usersId,
+  const createdUsers = await Users.create({
+    userId,
+    password,
     name,
-    content,
     title,
+    content,
     date: new Date(),
   });
 
-  res.json({ users: createUsers });
+  res.json({ users: "생성하였습니다" });
+});
+
+router.get("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const users = await Users.findById(userId)
+      .select("-password -content -__v")
+      .sort({ createdAt: -1 });
+
+    if (!users) {
+      return res.status(404).json({ error: "찾을 수 없습니다" });
+    }
+
+    res.json({ data: users });
+  } catch (error) {
+    res.status(500).json({ error: "조회에 실패했습니다" });
+  }
+});
+
+router.put("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { password, title, content } = req.body;
+
+  try {
+    const users = await users.findOne({ userId, password });
+
+    if (!users) {
+      return res.status(404).json({ error: "찾을 수 없습니다" });
+    }
+
+    await Users.updateOne({ userId, password }, { $set: { title, content } });
+
+    res.json({ message: "수정되었습니다" });
+  } catch (error) {
+    res.status(500).json({ error: "수정되지 않았습니다" });
+  }
+});
+
+router.delete("/users/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const { password } = req.body;
+
+  try {
+    const users = await Users.findById(userId);
+
+    if (!users) {
+      return res.status(404).json({ error: "찾을 수 없습니다" });
+    }
+
+    if (users.password !== password) {
+      return res.status(401).json({ error: "비밀번호가 틀립니다" });
+    }
+
+    const deletedUsers = await Users.findByIdAndDelete(userId, password);
+
+    res.json({ message: "삭제 되었습니다" });
+  } catch (error) {
+    res.status(500).json({ error: "삭제되지 않았습니다" });
+  }
 });
 
 module.exports = router;

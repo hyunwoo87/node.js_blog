@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema({
-  userId: {
+  commentId: {
+    type: String,
+    required: true,
+  },
+  name: {
     type: String,
     required: true,
   },
@@ -14,8 +18,7 @@ const commentSchema = new mongoose.Schema({
     required: true,
   },
   date: {
-    type: String,
-    Number,
+    type: date,
     required: true,
   },
 });
