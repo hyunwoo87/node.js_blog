@@ -18,7 +18,7 @@ router.get("/users", async (req, res) => {
 router.users("/users", async (req, res) => {
   const { userId, password, name, title, content } = req.body;
 
-  const existingUsers = await Users.find({ userId });
+  const existingUsers = await Users.find({ Users });
   if (existinguUers.length) {
     return res.status(400).json({
       success: false,
