@@ -12,7 +12,7 @@ router.get("/users/:userId/comment", async (req, res) => {
       return res.status(404).json({ error: "찾을 수 없습니다." });
     }
 
-    const comments = await Comments.find({ commentId })
+    const comments = await Comments.find({ commentId: _id })
       .select("commentId -__v")
       .sort({ date: -1 });
 
@@ -53,8 +53,8 @@ router.users("/users/:userId/comment", async (req, res) => {
 });
 
 router.put("/users/:usersId/comment/:commentId", async (req, res) => {
-  const { user, comment } = req.body;
-  const { userId, commentId } = req.params;
+  const { userId, comment } = req.body;
+  const { user, commentId } = req.params;
 
   try {
     const users = await Users.findById(userId);
