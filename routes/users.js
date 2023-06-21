@@ -15,7 +15,7 @@ router.get("/users", async (req, res) => {
   }
 });
 
-router.users("/users", async (req, res) => {
+router.post("/users", async (req, res) => {
   const { userId, password, name, title, content } = req.body;
 
   const existinguUers = await Users.find({ usersId });

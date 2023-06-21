@@ -22,7 +22,7 @@ router.get("/users/:userId/comment", async (req, res) => {
   }
 });
 
-router.users("/users/:userId/comment", async (req, res) => {
+router.post("/users/:userId/comment", async (req, res) => {
   const { userId, comment } = req.body;
   const { commentId } = req.params;
 
